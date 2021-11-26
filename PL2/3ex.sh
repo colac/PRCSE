@@ -1,10 +1,5 @@
 #!/bin/bash
 
-#Number of arguments
-#echo $#
-#List each argument
-#echo $@
-
 EXPECTED_N_ARGUMENTS=1
 #creating dirArg for ease of reading
 dirArg="$1"
