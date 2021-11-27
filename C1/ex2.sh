@@ -11,14 +11,19 @@ varCsvFile="$2"
 funcSortUsernames () {
     # Sort the file given by the user in reverse order -r
     # Cut the line from the comma onwards ("user,password" will only display "user")
-    # Apply the awk filter, lines starting with p or P are excluded
+    # Apply the awk filter, lines starting with p or P are excluded. Remove "|^[^P]" to get only usernames starting with "p"
     # Tee allows the output to be redirected to the file noNamesWithLetterP.txt and to the console at the same time
     sort -r "$varCsvFile" | cut -d , -f 1 | awk '/^[^p|^[^P]/' | tee noNamesWithLetterP.txt
 }
 
 funcCountUsernames () {
-    # 
-    sort -r "$varCsvFile" | awk '/^[^p|^[^P]/ { print $1 }'
+    #
+    i=0
+    for fileTxt in $(cat "$varCsvFile" | cut -d , -f 2 | awk '/^b|^B/')
+        do
+            let "i++"
+        done
+    printf "There are "$i" users with passwords starting with 'b'"
 }
 
 ### Execution of script ###
