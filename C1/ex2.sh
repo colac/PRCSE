@@ -9,11 +9,17 @@ varCsvFile="$2"
 ### Functions ###
 
 funcSortUsernames () {
-    # Sort the file given by the user in reverse order -r and then apply the awk filter, lines starting with p or P are excluded, and only the first collumn is printed
-    sort -r "$varCsvFile" | awk '/^[^p|^[^P]/ { print $1 }'
+    # Sort the file given by the user in reverse order -r
+    # Cut the line from the comma onwards ("hugo,password" will only display "hugo")
+    # Apply the awk filter, lines starting with p or P are excluded
+    # Tee allows the output to be redirected to the file noNamesWithLetterP.txt and to the console at the same time
+    sort -r "$varCsvFile" | cut -d , -f 1 | awk '/^[^p|^[^P]/' | tee noNamesWithLetterP.txt
 }
 
-
+funcCountUsernames () {
+    # 
+    sort -r "$varCsvFile" | awk '/^[^p|^[^P]/ { print $1 }'
+}
 
 ### Execution of script ###
 
