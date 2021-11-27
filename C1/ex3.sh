@@ -19,3 +19,6 @@ if [[ $# -eq EXPECTED_N_ARGUMENTS ]]; then
 else
 	printf "ERROR - Invalid number of arguments (expected %d, given %d)\n" $EXPECTED_N_ARGUMENTS $#
 fi
+
+# Give terminal new line
+printf "\n"
