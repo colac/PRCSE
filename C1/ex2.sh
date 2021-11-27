@@ -20,7 +20,7 @@ funcCountUsernames () {
     # For cicle uses cat output to be created
     # Cut command will output the passwords only. -d is the delimiter "," and -f is the fields to be cut, in this case we wil retrive the password ("user,password" will outpu "password" -> example: echo user,password | cut -d , -f 2)
     # awk will search for password, because it's the output pipped from cut, that start with "b" or "B"
-    # 
+    # Var numberOfNamesStartingWithB is the counter of passwords that match our requirements
     numberOfNamesStartingWithB=0
     for fileTxt in $(cat "$varCsvFile" | cut -d , -f 2 | awk '/^b|^B/')
         do
