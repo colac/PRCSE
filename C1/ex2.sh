@@ -10,7 +10,7 @@ varCsvFile="$2"
 
 funcSortUsernames () {
     # Sort the file given by the user in reverse order -r
-    # Cut the line from the comma onwards ("hugo,password" will only display "hugo")
+    # Cut the line from the comma onwards ("user,password" will only display "user")
     # Apply the awk filter, lines starting with p or P are excluded
     # Tee allows the output to be redirected to the file noNamesWithLetterP.txt and to the console at the same time
     sort -r "$varCsvFile" | cut -d , -f 1 | awk '/^[^p|^[^P]/' | tee noNamesWithLetterP.txt
