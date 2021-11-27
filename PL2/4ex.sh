@@ -2,6 +2,7 @@
 # CSV files needs to have an empty line at the end of the file, so that IFS reads the last line (needs \n)
 varCsvFile="$1"
 
+# Ex. 4 a)
 funcHighestSalary () {
     if [[ -f "$varCsvFile" ]]; then
         # Get number of lines in csv and remove one, the heading
@@ -10,57 +11,37 @@ funcHighestSalary () {
         varNumberOfLines=("`expr $varNumberOfLines - 1`")
         varLineIncrement=0
         varSalarySaved=0
-        varArraySalariesSavedFlag=0
-        declare -A arraySalariesSaved
+        # Ignored the 1st line of the csv due to the headings, sed feeds the output after 1st line to IFS (Internal Field Separator)
         sed 1d $varCsvFile | while IFS=, read -r varName varAge varSalary
         do
-            #printf "$varName $varAge $varSalary\n"
+            #printf ""$varName" $varAge $varSalary\n"
             # Increment counter that will flag the program to printf the highest earner or array of highest eaners 
             let "varLineIncrement++"
             # Regex validates if the var starts with a number 0 to 9. Accepts a dot if it has numbers after (12 or 12.1 OK) (12. NOK)
             varRegexSalary='^[0-9]+([.][0-9]+)?$'
             if [[ $varSalary =~ $varRegexSalary ]]; then
-                # printf "$varSalarySaved varSalarySaved\n"
-                # printf "$varSalary varSalary\n"
-                if [[ $varSalary -gt $varSalarySaved ]]; then
-                    #echo "unsetted arraySalariesSaved"
-                    if [[ $varArraySalariesSavedFlag -eq 1 ]]; then
-                        unset arraySalariesSaved
-                        declare -A arraySalariesSaved
-                    # for varNameArray in "${!arraySalariesSaved[@]}"; 
-                    #     do
-                    #         echo "FOR ${arraySalariesSaved[$varNameArray]}"
-                    #         unset arraySalariesSaved[varNameArray]
-                    #     done
-                    fi
-                    varArraySalariesSavedFlag=0
-                    varNameSaved=$varName
+                            # First scenario, where $varSalarySaved is still 0
+                if [[ $varSalarySaved -eq 0 ]]; then
+                    varNameSaved="$varName"
                     varSalarySaved=$varSalary
-                elif [[ $varSalary -eq $varSalarySaved ]]; then
-                    # echo "varLineIncrement -eq "$varLineIncrement
-                    varArraySalariesSavedFlag=1
-                    arraySalariesSaved["$varName"]+="$varSalary"
-                    #echo "ELIF for ${arraySalariesSaved[@]}"
-                else
-                    toDelete=1
-                    #echo "varNumberOfLines neither "$varNumberOfLines
-                    #echo "varLineIncrement neither "$varLineIncrement
+                elif [[ $varSalary -eq $varSalarySaved ]] && [[ $varSalarySaved -ne 0 ]]; then
+                    arrayNamesSaved+=("$varName")
+                    varSalarySaved=$varSalary
+                elif [[ $varSalary -gt $varSalarySaved ]] && [[ $varSalarySaved -ne 0 ]]; then
+                    arrayNamesSaved=()
+                    varNameSaved="$varName"
+                    varSalarySaved=$varSalary
+                    arrayNamesSaved+=("$varName")
                 fi
             else
                 printf "\nERROR: $varSalary Not a number\n"
             fi
-            # echo $varLineIncrement
-            # echo $varNumberOfLines
-            # If IFS= loop has gotten to the end of file and the associative array was not created, then display the highest payed employee
-            if [[ $varLineIncrement -eq $varNumberOfLines ]] && [[ $varArraySalariesSavedFlag -ne 1 ]]; then
-                printf "\nEmployee $varNameSaved has the highest salary, at $varSalarySaved€\n"
-            # If IFS= loop has gotten to the end of file and the associative array was created, then display the highest payed employees
-            elif [[ $varLineIncrement -eq $varNumberOfLines ]] && [[ $varArraySalariesSavedFlag -eq 1 ]]; then
-                #echo $varArraySalariesSavedFlag
-                echo "${arraySalariesSaved[@]}"
-                for varNameArray in "${!arraySalariesSaved[@]}"; 
-                    do 
-                        printf "\nEmployee $varNameArray, has a salary of ${arraySalariesSaved[$varNameArray]}"; 
+            # If IFS= loop has gotten to the end of file, then display the highest payed employees
+            if [[ $varLineIncrement -eq $varNumberOfLines ]]; then
+                printf "\nName of the employee(s) with the highest salary of $varSalarySaved€:"
+                for varNameArray in "${arrayNamesSaved[@]}"
+                    do
+                        printf "\n$varNameArray"; 
                     done
             fi
         done #< "$varCsvFile"
@@ -73,11 +54,3 @@ funcHighestSalary () {
 funcHighestSalary
 # Give terminal new line
 printf "\n"
-
-# var1=1
-# var2=1
-# if [ $var1 -gt $var2 ]; then
-#     printf "$var1 -gt $var2"
-# elif [[ $var1 -eq $var2 ]]; then
-#     printf "$var1 -eq $var2"
-# fi
