@@ -52,3 +52,35 @@ fi
 
 # Give terminal new line
 printf "\n"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # # Array with the lines of all the files 
+    # arrayTotalNrOfLines=()
+    # # Array with only 5 elements, the highest number of lines
+    # arrayTopFiveLines=()
+
+    # countToFive=0
+
+    # for varTotalNrOfLines in $(find $dirArg -maxdepth 1 -type f -name "*.txt"); do
+    #     varGetNrOfLines=$(sed -n '$=' "$varTotalNrOfLines")
+    #     arrayTotalNrOfLines+=("$varGetNrOfLines")
+    # done
+    # #printf "%s\n" "${arrayTotalNrOfLines[@]}" | sort -rn | head -n 5
+
+
+    # for varTopFiveLines in $(printf "%s\n" "${arrayTotalNrOfLines[@]}" | sort -rn | head -n 5); do
+    #     arrayTopFiveLines+=("$varTopFiveLines")
+    # done
+    # printf "%s\n" "${arrayTopFiveLines[@]}" | sort -rn
