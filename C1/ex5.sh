@@ -13,10 +13,13 @@ declare -A arrayUserPasswordDate
 # Get current date in format 20201201
 varCurrentDate=$(date +%Y%m%d)
 
+# For loop gets the users present in file /etc/passwd, by cutting all text after the special char : and keeping the users. lacerda:x:1001:1001::/home/lacerda:/bin/bash -> lacerda
 for user in $(cut -d: -f1 /etc/passwd); do
-    #varExpirationDate=$(echo -e "\n $user \n" && chage -l $user | grep "Password expires" | cut -d ":" -f2)
+    # "chage" command allows changing/getting user password expiry information -> https://explainshell.com/explain?cmd=chage
+    # "grep" is used to get only the line that relates to password expiring, "Password expires : Dec 01, 2021"
+    # "cut" removes the text before the special char :
     varExpirationDate=$(chage -l $user | grep "Password expires" | cut -d ":" -f2)
-    #echo $varExpirationDate
+    # Filling the associative array with the user name and password expiration date
     arrayUserPasswordDate[$user]=$varExpirationDate
 done
 
