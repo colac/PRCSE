@@ -1,4 +1,11 @@
 #!/bin/bash
+##  Usefull links for this work  ##
+##
+# https://linuxhint.com/associative_array_bash/
+# https://linuxhint.com/count-the-number-of-lines-in-a-file-in-bash/
+# https://explainshell.com/explain?cmd=basename
+# https://stackoverflow.com/questions/3685970/check-if-a-bash-array-contains-a-value
+##
 
 EXPECTED_N_ARGUMENTS=1
 # Creating dirArg for ease of reading
@@ -21,9 +28,9 @@ if [[ $# -eq EXPECTED_N_ARGUMENTS ]]; then
         arrayTopFiveLines=()
         # Used "-maxdepth 1" so that find only searches the given dir by the user, if not, find will go to subdirs
         for fileTxt in $(find $dirArg -maxdepth 1 -type f -name "*.txt"); do
-            # Gets the number of lines of the $file, https://linuxhint.com/count-the-number-of-lines-in-a-file-in-bash/
+            # Gets the number of lines of the $file, 
             varGetNrOfLines=$(sed -n '$=' "$fileTxt")
-            # Strip directory and suffix from filenames, https://explainshell.com/explain?cmd=basename
+            # Strip directory and suffix from filenames
             fileTxt=$(basename $fileTxt)
             # Adding all the number of lines to the simple array arrayTotalNrOfLines. Ex.: arrayTotalNrOfLines=(3 7 5 11 8 20 2 15)
             arrayTotalNrOfLines+=("$varGetNrOfLines")
