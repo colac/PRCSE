@@ -1,3 +1,3 @@
 general_log.log
-C2/__pycache__/app_logging.cpython-39.pyc
+*.cpython-39.pyc
 C2/__pycache__/logging.cpython-39.pyc
