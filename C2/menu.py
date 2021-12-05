@@ -28,6 +28,5 @@ def main():
             exit()
         else:
             print(f'\nPlease insert a valid option. Choice: {choice} is NOT valid!')
-            #os.system("clear")
 
 main()
