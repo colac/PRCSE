@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-import os
+import os, logging
+import app_logging
 
 # Main menu, the 1st menu the operator sees
 def mainMenu():
@@ -29,7 +30,6 @@ def mainMenu():
         else:
             os.system("clear")
             print(f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!')
-
 
 # User menu, perform operations related to user accounts
 def userMenu():
@@ -131,4 +131,5 @@ def rolesMenu():
             print(f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!')
 
 # Calling main menu function
+logging.info('### INFO - Starting script ###\n')
 mainMenu()
