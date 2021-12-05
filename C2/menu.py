@@ -27,7 +27,8 @@ def mainMenu():
             print(f'\nChoice: {choice}')
             exit()
         else:
-            print(f'\nPlease insert a valid option. Choice: {choice} is NOT valid!')
+            os.system("clear")
+            print(f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!')
 
 
 # User menu, perform operations related to user accounts
@@ -60,7 +61,7 @@ def userMenu():
             print(f'\nChoice: {choice}')
             exit()
         else:
-            print(f'\nPlease insert a valid option. Choice: {choice} is NOT valid!')
+            print(f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!')
 
 # Resources menu, perform operations related to resources
 def resourcesMenu():
@@ -93,7 +94,7 @@ def resourcesMenu():
             print(f'\nChoice: {choice}')
             exit()
         else:
-            print(f'\nPlease insert a valid option. Choice: {choice} is NOT valid!')
+            print(f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!')
 
 # Roles menu, perform operations related to roles
 def rolesMenu():
@@ -127,7 +128,7 @@ def rolesMenu():
             print(f'\nChoice: {choice}')
             exit()
         else:
-            print(f'\nPlease insert a valid option. Choice: {choice} is NOT valid!')
+            print(f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!')
 
 # Calling main menu function
 mainMenu()
