@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import os, logging
 import app_logging
+from crud_resources import *
+from createDB import *
 
 # Main menu, the 1st menu the operator sees
 def mainMenu():
@@ -18,14 +20,18 @@ def mainMenu():
 
         if choice == '1':
             print(f'\nChoice: {choice}')
+            userMenu()
         elif choice == '2' :
             print(f'\nChoice: {choice}')
+            resourcesMenu()
         elif choice == '3' :
             print(f'\nChoice: {choice}')
+            rolesMenu()
         elif choice == '4' :
             print(f'\nChoice: {choice}')
         elif choice == '0':
             print(f'\nChoice: {choice}')
+            con.close()
             exit()
         else:
             os.system("clear")
@@ -75,8 +81,9 @@ def resourcesMenu():
         2 : Update/Modify company resource
         3 : Delete company resource
         4 : List which users have access to a specific resource
-        5 : List all resources
-        6 : Return to main menu
+        5 : List resources that contain "input" in the name
+        6 : List all resources
+        7 : Return to main menu
         0 : Exit"""
               )
         choice = input("\nEnter your choice : ")
@@ -91,9 +98,25 @@ def resourcesMenu():
             print(f'\nChoice: {choice}')
         elif choice == '5' :
             print(f'\nChoice: {choice}')
+            # Print resources that contain "{resource}"
+            resource = input("\nList of resources that contain:")
+            print(f'\n### List of resources that contain "{resource}" in the name###')
+            resource = "%"+resource+"%"
+            results = list_resource(con,(resource,))
+            for row in results:
+                print(row[0])
+        elif choice == '6' :
+            print(f'\n### List of all resources ###')
+            # Print all resources
+            results = list_resource(con,"ALL")
+            for row in results:
+                print(row[0])
+        elif choice == '6' :
+            print(f'\nChoice: {choice}')
             mainMenu()
         elif choice == '0':
             print(f'\nChoice: {choice}')
+            con.close()
             exit()
         else:
             print(f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!')
@@ -129,10 +152,20 @@ def rolesMenu():
             mainMenu()
         elif choice == '0':
             print(f'\nChoice: {choice}')
+            con.close()
             exit()
         else:
             print(f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!')
             logging.error(f'ERROR - Choice: {choice} is NOT valid!')
+
+### Script execution ###
+
+# Connect to database
+try:
+    con = sqlite3.connect('example.db')
+    createTables(con)
+except:
+    print("Not possible to connect to database")
 
 # Calling main menu function
 logging.info('### INFO - Starting script ###\n')
