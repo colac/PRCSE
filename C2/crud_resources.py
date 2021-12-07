@@ -82,5 +82,4 @@ def update_resource(con,update_values):
 #   resource    tuple with resource to delete
 # ----------------------------------
 def delete_resource(con,resource):
-    print(resource)
     con.execute('DELETE FROM resources WHERE rs_name = (?)', (resource))

@@ -95,15 +95,21 @@ def resourcesMenu():
         elif choice == '2' :
             print(f'\nChoice: {choice}')
         elif choice == '3' :
-            # Delete a resource, gets input from user
+            # Delete a resource, gets input from user. Before deleting checks if it exists in DB
             resource = input("\nName of the resource to delete: ")
             varQuestionDelete = input(f"\nAre you sure you want to delete resource: {resource}? (Y/N)")
             if varQuestionDelete in ('y', 'yes', 'Y', 'YES'):
-                delete_resource(con,(resource,))
-                # Delete operation requires a commit, so that when the connection is closed to the DB the resource is actually deleted
-                con.commit()
+                varFind_resource = find_resource(con,(resource,))
+                if varFind_resource[0] == resource:
+                    delete_resource(con,(resource,))
+                    # Delete operation requires a commit, so that when the connection is closed to the DB the resource is actually deleted
+                    con.commit()
+                    print(f'Resource: {resource}, deleted')
+                    logging.info(f'### INFO - Resource: {resource}, deleted ###\n')
+                else:
+                    print(f'{resource}, is not a resource!')
             else:
-                print(f'\Resource: {resource}, not deleted')
+                print(f'Resource: {resource}, not deleted')
         elif choice == '4' :
             print(f'\nChoice: {choice}')
         elif choice == '5' :
