@@ -28,7 +28,7 @@ import sqlite3
 def insert_resource(con,resource):
     try:
         with con:
-            con.execute("insert into resources values (?)", (resource))
+            con.execute("INSERT INTO resources VALUES (?)", (resource))
     except sqlite3.IntegrityError:
         print("Resource already exists")
 
@@ -82,4 +82,5 @@ def update_resource(con,update_values):
 #   resource    tuple with resource to delete
 # ----------------------------------
 def delete_resource(con,resource):
+    print(resource)
     con.execute('DELETE FROM resources WHERE rs_name = (?)', (resource))

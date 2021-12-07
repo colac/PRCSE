@@ -77,27 +77,36 @@ def resourcesMenu():
         #os.system("clear")
         print("\nChoose an option: ")
         print("""
-        1 : Create company resource
+        1 : Create company resource                             (DONE)
         2 : Update/Modify company resource
-        3 : Delete company resource
+        3 : Delete company resource                             (DONE)
         4 : List which users have access to a specific resource
-        5 : List resources that contain "input" in the name
-        6 : List all resources
+        5 : List resources that contain "input" in the name     (DONE)
+        6 : List all resources                                  (DONE)
         7 : Return to main menu
         0 : Exit"""
               )
         choice = input("\nEnter your choice : ")
 
         if choice == '1':
-            print(f'\nChoice: {choice}')
+            # Create new resource, gets input from user
+            resource = input("\nName of the resource to create:")
+            insert_resource(con,(resource,))
         elif choice == '2' :
             print(f'\nChoice: {choice}')
         elif choice == '3' :
-            print(f'\nChoice: {choice}')
+            # Delete a resource, gets input from user
+            resource = input("\nName of the resource to delete: ")
+            varQuestionDelete = input(f"\nAre you sure you want to delete resource: {resource}? (Y/N)")
+            if varQuestionDelete in ('y', 'yes', 'Y', 'YES'):
+                delete_resource(con,(resource,))
+                # Delete operation requires a commit, so that when the connection is closed to the DB the resource is actually deleted
+                con.commit()
+            else:
+                print(f'\Resource: {resource}, not deleted')
         elif choice == '4' :
             print(f'\nChoice: {choice}')
         elif choice == '5' :
-            print(f'\nChoice: {choice}')
             # Print resources that contain "{resource}"
             resource = input("\nList of resources that contain:")
             print(f'\n### List of resources that contain "{resource}" in the name###')
@@ -106,15 +115,17 @@ def resourcesMenu():
             for row in results:
                 print(row[0])
         elif choice == '6' :
-            print(f'\n### List of all resources ###')
             # Print all resources
+            print(f'\n### List of all resources ###')
             results = list_resource(con,"ALL")
             for row in results:
                 print(row[0])
-        elif choice == '6' :
+        elif choice == '7' :
+            # Return to main menu
             print(f'\nChoice: {choice}')
             mainMenu()
         elif choice == '0':
+            # Exit the script
             print(f'\nChoice: {choice}')
             con.close()
             exit()

@@ -11,12 +11,12 @@ except:
     print("Not possible to connect to database")
 
 # createTables(con)
-# resource1=("resource1",)
-# insert_resource(con,resource1)
-# resource2=("resource2",)
-# insert_resource(con,resource2)
-# resource3=("resource3",)
-# insert_resource(con,resource3)
+resource1=("resource1",)
+insert_resource(con,resource1)
+resource2=("resource2",)
+insert_resource(con,resource2)
+resource3=("resource3",)
+insert_resource(con,resource3)
 
 # print(list_resource(con,"ALL"))
 
