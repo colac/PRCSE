@@ -15,8 +15,8 @@ def converto_to_ms(days_valid):
     expiration_milisec_date = expiration_date.timestamp() * 1000
     return expiration_milisec_date
 
-days_valid = input("How many days should this password be valid for: ")
-print(converto_to_ms(days_valid))
+#days_valid = input("How many days should this password be valid for: ")
+#print(converto_to_ms(days_valid))
 
 
 # Convert the timestamp in miliseconds to date, used for password expiration
@@ -29,4 +29,4 @@ def converto_from_ms(date_to_convert):
     date_converted = date_converted.strftime('%Y-%m-%d')
     return date_converted
 
-print(converto_from_ms(converto_to_ms(days_valid)))
+#print(converto_from_ms(converto_to_ms(days_valid)))

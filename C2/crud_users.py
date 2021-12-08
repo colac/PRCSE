@@ -31,7 +31,7 @@ def insert_user(con,user):
             con.execute("insert into users values (?,?,?,?,?,?)", (user))
             return("OK")
     except sqlite3.IntegrityError:
-        return("user already exists")
+        return("User already exists")
     except sqlite3.Error as e:
         return("An error occurred:", e.args[0])
 

@@ -1,35 +1,13 @@
 #!/usr/bin/env python3
-import os, logging
-import app_logging
+import os, logging, re, hashlib
 from datetime import datetime, timezone, timedelta
+import app_logging
 from crud_resources import *
 from createDB import *
 from crud_users import *
 from crud_roles import *
 from crud_user_roles import *
-
-# Create the timestamp in miliseconds, used for password expiration date
-def converto_to_ms(days_valid):
-    # Convert number of days, currently a string, to int
-    days_valid = int(days_valid)
-    # The method "strptime" creates a datetime object from the given string. This string is created using "strftime"
-    # Creating the current date string, like "2021-12-08"
-    current_date = datetime.strptime(datetime.now(timezone.utc).strftime("%Y%m%d"),'%Y%m%d')
-    # Creates the expiration date string. "timedelta" is a class that allows the input of a duration, expressing the difference between two dates, in our case the variable "days" 
-    expiration_date = current_date + timedelta(days=days_valid)
-    # Convert date to miliseconds
-    expiration_milisec_date = expiration_date.timestamp() * 1000
-    return expiration_milisec_date
-
-# Convert the timestamp in miliseconds to date, used for password expiration
-def converto_from_ms(date_to_convert):
-    # Convert value received, currently a string, to int
-    date_to_convert = int(date_to_convert)
-    # Convert from miliseconds to date Year-Month-Day HH:MM:SS
-    date_converted = datetime.fromtimestamp(date_to_convert/1000.0)
-    # Show only Year-Month-Day, removing HH:MM:SS
-    date_converted = date_converted.strftime('%Y-%m-%d')
-    return date_converted
+from date_operations import *
 
 # Main menu, the 1st menu the operator sees
 def mainMenu():
@@ -77,27 +55,55 @@ def userMenu():
         print(error)
         print("\nChoose an option: ")
         print("""
-        1 : Create user account
+        1 : Create user account                   (DONE)
         2 : Update/Modify user account
         3 : Delete user account
-        4 : List information of a user account
-        5 : List information of all user accounts
+        4 : List information of a user account    (DONE)
+        5 : List information of all user accounts (DONE)
         6 : Return to main menu
         0 : Exit"""
               )
         choice = input("\nEnter your choice : ")
 
         if choice == '1':
-            print(f'\nChoice: {choice}')
+            username = input('\nType user account name: ')
+            name = input('\nType user name: ')
+            bank_account_number = input('\nType bank account number: ')
+            password_beforehash = input('\nType the password: ').encode('UTF-8')
+            password = hashlib.sha256(password_beforehash).hexdigest()
+            # While the user doesn't input a valid number [1-30], the cycle continues
+            while True:
+                password_validity_days = input('\nType how many days should this password be valid for [1-30]: ')
+                # Regex validates if the numbre of days is in the range [1-30]. 
+                # ^([1-9] -> check if the beginning of the string is in the range [1-9]
+                # | -> regex OR operator
+                # |1[0-9] -> OR the string starts with 1 in combination with the range [0-9], checks for range [10-19]
+                # |2[0-9] -> OR the string starts with 2 in combination with the range [0-9], checks for range [20-29]
+                # |3[0] -> OR the string starts with 1 in combination with the range [0-9], checks for value [3]
+                if not re.search("^([1-9]|1[0-9]|2[0-9]|3[0])$", password_validity_days):
+                    print(f'\n[ERROR] - Password validity must be in the range [1-30]!')
+                    continue
+                else:
+                    print(f'\nValidity ok.')
+                    break
+            password_expire_date = converto_to_ms(password_validity_days)
+            # Create user tuple to send to the DB
+            user=(username,name,bank_account_number,password,password_validity_days,password_expire_date)
+            # Creating user in DB
+            insert_user_return = insert_user(con, user)
+            if insert_user_return == "OK":
+                error=f'\n[INFO] - User: {username} creation success!'
+            else:
+                error=f'\n[ERROR] - Couldnt create user: {username}\n{insert_user_return}'
         elif choice == '2' :
             print(f'\nChoice: {choice}')
         elif choice == '3' :
             print(f'\nChoice: {choice}')
         elif choice == '4' :
-            user = input('\nType user account name: ')
+            username = input('\nType user account name: ')
             # Get current values from the role in the DB
-            results = find_user(con,(user,))
-            print(f'\nUsername: {results[0]}; Name: {results[1]}; Bank Account Number: {results[2]}; Password valid for: {results[3]} days; Password expiration date: {results[4]}')
+            results = find_user(con,(username,))
+            print(f'\n[Username]: {results[0]}; [Name]: {results[1]}; [Bank Account Number]: {results[2]}; [Password valid for]: {results[3]} days; [Password expiration date]: {results[4]}')
             input("\nPress <enter> to continue")
             userMenu()
         elif choice == '5' :
