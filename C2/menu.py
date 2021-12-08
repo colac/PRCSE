@@ -8,6 +8,7 @@ from crud_users import *
 from crud_roles import *
 from crud_user_roles import *
 from date_operations import *
+from password_validation import *
 
 # Main menu, the 1st menu the operator sees
 def mainMenu():
@@ -57,7 +58,7 @@ def userMenu():
         print("""
         1 : Create user account                   (DONE)
         2 : Update/Modify user account
-        3 : Delete user account
+        3 : Delete user account                   (DONE)
         4 : List information of a user account    (DONE)
         5 : List information of all user accounts (DONE)
         6 : Return to main menu
@@ -69,8 +70,17 @@ def userMenu():
             username = input('\nType user account name: ')
             name = input('\nType user name: ')
             bank_account_number = input('\nType bank account number: ')
-            password_beforehash = input('\nType the password: ').encode('UTF-8')
-            password = hashlib.sha256(password_beforehash).hexdigest()
+            while True:
+                password_before_hash = input('\nType the password: ')
+                validate_password_return = validarPassword(password_before_hash)
+                if not validate_password_return == "OK":
+                    print(f'\n{validate_password_return}')
+                    continue
+                else:
+                    #print(f'\nValidity ok.')
+                    password_before_hash = password_before_hash.encode('UTF-8')
+                    break
+            password_hash = hashlib.sha256(password_before_hash).hexdigest()
             # While the user doesn't input a valid number [1-30], the cycle continues
             while True:
                 password_validity_days = input('\nType how many days should this password be valid for [1-30]: ')
@@ -84,21 +94,43 @@ def userMenu():
                     print(f'\n[ERROR] - Password validity must be in the range [1-30]!')
                     continue
                 else:
-                    print(f'\nValidity ok.')
+                    #print(f'\nValidity ok.')
                     break
             password_expire_date = converto_to_ms(password_validity_days)
             # Create user tuple to send to the DB
-            user=(username,name,bank_account_number,password,password_validity_days,password_expire_date)
+            user = (username,name,bank_account_number,password_hash,password_validity_days,password_expire_date)
             # Creating user in DB
             insert_user_return = insert_user(con, user)
+            # If user creation went ok, return info to user
             if insert_user_return == "OK":
-                error=f'\n[INFO] - User: {username} creation success!'
+                error = f'\n[INFO] - User: {username} creation success!'
+            # If user creation didn't go ok, return error to user
             else:
                 error=f'\n[ERROR] - Couldnt create user: {username}\n{insert_user_return}'
         elif choice == '2' :
             print(f'\nChoice: {choice}')
         elif choice == '3' :
-            print(f'\nChoice: {choice}')
+            # Delete a role, gets input from user. Before deleting checks if it exists in DB
+            username = input("\nUsername to delete: ")
+            varQuestionDelete = input(f"\nAre you sure you want to delete role: {username}? (Y/N)")
+            if varQuestionDelete in ('y', 'yes', 'Y', 'YES'):
+                varFind_username = find_user(con,(username,))
+                if varFind_username[0] == username:
+                    delete_user_return = delete_user(con,(username,))
+                    # Delete operation requires a commit, so that when the connection is closed to the DB, the user is actually deleted
+                    con.commit()
+                    # If user delete went ok, return info to user
+                    if delete_user_return == "OK":
+                        error = f'\n[INFO] - User: "{username}" deleted.'
+                        logging.info(f'### INFO - role: "{username}"", deleted ###\n')
+                    # If user creation didn't go ok, return error to user
+                    else:
+                        error = f'\n[ERROR] - Couldnt delete user: "{username}"\n"{insert_user_return}"'
+                        logging.info(f'\n[ERROR] - Couldnt delete user: "{username}"\n"{insert_user_return}"\n')
+                else:
+                    print(f'{username}, is not a role!')
+            else:
+                print(f'Role: {username}, not deleted')
         elif choice == '4' :
             username = input('\nType user account name: ')
             # Get current values from the role in the DB
@@ -245,7 +277,7 @@ def rolesMenu():
             # In case the user doesn't write anything, we save this variable to use later
             role_name = input(f'\nNew name of the role (To keep the current name "{role_name_current}", just hit "Enter" button): ')
             if not role_name.isspace() and not role_name.strip():
-                print("Nothing written for roleName")
+                #print("Nothing written for roleName")
                 role_name = role_name_current
             # Get new resource for the role, or keep the same by hitting enter
             role_resource = input(f'\nName of the resource this role, will grant access (To keep the current resource "{role_resource_current}", just hit "Enter" button): ')

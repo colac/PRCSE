@@ -18,7 +18,6 @@ def converto_to_ms(days_valid):
 #days_valid = input("How many days should this password be valid for: ")
 #print(converto_to_ms(days_valid))
 
-
 # Convert the timestamp in miliseconds to date, used for password expiration
 def converto_from_ms(date_to_convert):
     # Convert value received, currently a string, to int
