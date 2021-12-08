@@ -57,7 +57,7 @@ def userMenu():
         print("\nChoose an option: ")
         print("""
         1 : Create user account                   (DONE)
-        2 : Update/Modify user account
+        2 : Update/Modify user account            (DONE) - falta validar nr conta bancaria
         3 : Delete user account                   (DONE)
         4 : List information of a user account    (DONE)
         5 : List information of all user accounts (DONE)
@@ -123,10 +123,16 @@ def userMenu():
             else:
                 error=f'\n[ERROR] - Couldnt create user: {username}\n{insert_user_return}'
         elif choice == '2' :
-            # Modify user, gets input from user
-            username = input('\nType the username to modify: ')
-            # Get current values from the role in the DB
-            result = find_user(con,(username,))
+            while True:
+                # Modify user, gets input from user
+                username = input('\nType the username to modify: ')
+                # Get current values from the role in the DB
+                result = find_user(con,(username,))
+                if result is not None:
+                    break
+                else:
+                    print(f'\n[ERROR] - User "{username}" not found!')
+                    continue
             name_current = result[1]
             bank_account_number_current = result[2]
             password_validity_current = result[3]
@@ -140,16 +146,32 @@ def userMenu():
             bank_account_number = input(f'\nNew bank account number (To keep the current value "{bank_account_number_current}", just hit "Enter" button): ')
             if not bank_account_number.isspace() and not bank_account_number.strip():
                 bank_account_number = bank_account_number_current
-            # New password validity time, or keep the same by hitting enter
-            password_validity = input(f'\nNew password validity time (To keep the current value "{password_validity_current}", just hit "Enter" button): ')
+            while True:
+                # New password validity time, or keep the same by hitting enter
+                password_validity = input(f'\nNew password validity time (To keep the current value "{password_validity_current}", just hit "Enter" button): ')
+                # Regex validates if the numbre of days is in the range [1-30]. 
+                # ^([1-9] -> check if the beginning of the string is in the range [1-9]
+                # | -> regex OR operator
+                # |1[0-9] -> OR the string starts with 1 in combination with the range [0-9], checks for range [10-19]
+                # |2[0-9] -> OR the string starts with 2 in combination with the range [0-9], checks for range [20-29]
+                # |3[0] -> OR the string starts with 1 in combination with the range [0-9], checks for value [3]
+                if not re.search("^([1-9]|1[0-9]|2[0-9]|3[0])$", password_validity_days):
+                    print(f'\n[ERROR] - Password validity must be in the range [1-30]!')
+                    continue
+                else:
+                    #print(f'\nValidity ok.')
+                    break
             if not password_validity.isspace() and not password_validity.strip():
                 password_validity = password_validity_current
             # Create tuple to feed the update function
             update_values = (name,bank_account_number,password_validity,username)
             error = update_user(con,update_values)
             if error == "OK":
-                error = f'[INFO] - User "{username}" updated successfully.'
+                error = f'[INFO] - User: "{username}" updated successfully.'
                 logging.info(f'[INFO] - Role: {username}, updated successfully.\n')
+            else:
+                error = f'[ERROR] - User: "{username}" couldnt be updated.'
+                logging.error(f'[ERROR] - User: {username} couldnt be updated.\n')
         elif choice == '3' :
             # Delete a role, gets input from user. Before deleting checks if it exists in DB
             username = input("\nUsername to delete: ")
