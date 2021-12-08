@@ -8,7 +8,6 @@
 # About Python and SQLLite
 # https://docs.python.org/3/library/sqlite3.html#
 # https://www.sqlite.org/index.html
-# https://www.sqlitetutorial.net/sqlite-python
 
 # SQL operations usually need to use values from Python variables. However, beware of using Python’s 
 # string operations to assemble queries, as they are vulnerable to SQL injection attacks
@@ -18,7 +17,6 @@
 #  Instead, use the DB-API’s parameter substitution
 
 import sqlite3
-import app_logging
 
 
 # Insert resources
@@ -30,12 +28,9 @@ import app_logging
 def insert_resource(con,resource):
     try:
         with con:
-            con.execute("insert into resources values (?)", (resource))
-            return("OK")
+            con.execute("INSERT INTO resources VALUES (?)", (resource))
     except sqlite3.IntegrityError:
-        return("Resource already exists")
-    except sqlite3.Error as e:
-        return("An error occurred:", e.args[0])
+        print("Resource already exists")
 
 # List resources Function
 #
@@ -47,7 +42,7 @@ def insert_resource(con,resource):
 #   Tuple can have wildcards
 #
 #  RETURN:
-#   List of tuples with all table columns
+#   tuple with all table columns
 # ----------------------------------
 def list_resource(con,resource):
     if resource=="ALL":
@@ -55,6 +50,7 @@ def list_resource(con,resource):
         #    print(row)
         return con.execute('SELECT * FROM resources ORDER BY rs_name').fetchall()
     else:
+        #print(resource)
         return con.execute('SELECT * FROM resources WHERE rs_name like (?) ORDER BY rs_name', (resource)).fetchall()
 
 # Find resources Function
@@ -77,14 +73,7 @@ def find_resource(con,resource):
 #
 # ----------------------------------
 def update_resource(con,update_values):
-    try:
-        with con:
-            con.execute('UPDATE resources SET rs_name = (?) WHERE rs_name = (?)', (update_values))
-            return("OK")
-    except sqlite3.IntegrityError:
-        return("Update failed. Resource name should be unique.")
-    except sqlite3.Error as e:
-        return("An error occurred:", e.args[0])
+    con.execute('UPDATE resources SET rs_name = (?) WHERE rs_name = (?)', (update_values))
 
 # Delete resources Function
 #
@@ -93,9 +82,4 @@ def update_resource(con,update_values):
 #   resource    tuple with resource to delete
 # ----------------------------------
 def delete_resource(con,resource):
-    try:
-        with con:
-            con.execute('DELETE FROM resources WHERE rs_name = (?)', (resource))
-            return("OK")
-    except sqlite3.Error as e:
-        return("An error occurred:", e.args[0])
+    con.execute('DELETE FROM resources WHERE rs_name = (?)', (resource))

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 import logging, datetime
 
-# Logging script cannot be named logging.py. Causes conflits with the python logging module. This print shows that in the linux PATH, at runtime of the script,
-# the logging.py and the python module conflit with eachother. 
-# print(logging.__file__)
+# Logging script cannot be named logging.py. Causes conflits with the python logging module. This print shows that in the linux PATH, at runtime of the script, the logging.py and the python module conflit with eachother. 
+#print(logging.__file__)
 
 # Configure logging
 logging.basicConfig(filename='general_log.log', level=logging.INFO, format='%(asctime)s %(message)s')
+
 
 
 ## Examples of use
@@ -16,4 +16,4 @@ logging.basicConfig(filename='general_log.log', level=logging.INFO, format='%(as
 # print(f'\nInfo with command: {var}')
 
 # logging.error(f'ERROR - Command: {var}')
-# print(f'\nError with command: {var}'
+# print(f'\nError with command: {var}')
