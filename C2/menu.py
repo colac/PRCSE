@@ -155,7 +155,7 @@ def userMenu():
                 # |1[0-9] -> OR the string starts with 1 in combination with the range [0-9], checks for range [10-19]
                 # |2[0-9] -> OR the string starts with 2 in combination with the range [0-9], checks for range [20-29]
                 # |3[0] -> OR the string starts with 1 in combination with the range [0-9], checks for value [3]
-                if not re.search("^([1-9]|1[0-9]|2[0-9]|3[0])$", password_validity_days):
+                if not re.search("^([1-9]|1[0-9]|2[0-9]|3[0])$", password_validity):
                     print(f'\n[ERROR] - Password validity must be in the range [1-30]!')
                     continue
                 else:
