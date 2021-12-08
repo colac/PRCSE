@@ -69,11 +69,19 @@ def userMenu():
         if choice == '1':
             while True:
                 username = input('\nType user account name: ')
-                if not re.search('^[a-z0-9]+[\._]?[ a-z0-9]+[@]\w+[. ]\w{2,}$', username):
+                # Convert username to lowercase
+                username = username.lower()
+                # Check if the username entered is a valid email
+                # ^[a-z0-9-\._] -> check if the string start with [a-z] and/or [0-9] and/or [- . _] The slash \ serves as an escape character
+                # Check the presence of @
+                # Looks for char/word/number until the [.]
+                # After the [.] looks for char/word/number, bigger than 2 chars
+                # Example of valid email: nf_o.asd-asd@info1.info1
+                if not re.search('^[a-z0-9-\._]+[a-z0-9]+[@]\w+[.]\w{2,}$', username):
                     print(f'\n[ERROR] - Not a valid email!')
                     continue
                 else:
-                    print(f'\nValidity ok.')
+                    #print(f'\nValidity ok.')
                     break
             name = input('\nType user name: ')
             bank_account_number = input('\nType bank account number: ')
@@ -115,7 +123,33 @@ def userMenu():
             else:
                 error=f'\n[ERROR] - Couldnt create user: {username}\n{insert_user_return}'
         elif choice == '2' :
-            print(f'\nChoice: {choice}')
+            # Modify user, gets input from user
+            username = input('\nType the username to modify: ')
+            # Get current values from the role in the DB
+            result = find_user(con,(username,))
+            name_current = result[1]
+            bank_account_number_current = result[2]
+            password_validity_current = result[3]
+            # Get new name for the role, or keep the same by hitting enter
+            # In case the user doesn't write anything, we save this variable to use later
+            name = input(f'\nNew name (To keep the current value "{name_current}", just hit "Enter" button): ')
+            if not name.isspace() and not name.strip():
+                #print("Nothing written for userName")
+                name = name_current
+            # Get bank account number, or keep the same by hitting enter
+            bank_account_number = input(f'\nNew bank account number (To keep the current value "{bank_account_number_current}", just hit "Enter" button): ')
+            if not bank_account_number.isspace() and not bank_account_number.strip():
+                bank_account_number = bank_account_number_current
+            # New password validity time, or keep the same by hitting enter
+            password_validity = input(f'\nNew password validity time (To keep the current value "{password_validity_current}", just hit "Enter" button): ')
+            if not password_validity.isspace() and not password_validity.strip():
+                password_validity = password_validity_current
+            # Create tuple to feed the update function
+            update_values = (name,bank_account_number,password_validity,username)
+            error = update_user(con,update_values)
+            if error == "OK":
+                error = f'[INFO] - User "{username}" updated successfully.'
+                logging.info(f'[INFO] - Role: {username}, updated successfully.\n')
         elif choice == '3' :
             # Delete a role, gets input from user. Before deleting checks if it exists in DB
             username = input("\nUsername to delete: ")
@@ -343,11 +377,19 @@ def rolesMenu():
 ### Script execution ###
 
 # Connect to database
-try:
-    con = sqlite3.connect('example.db')
+if not os.path.isfile("example.db"):
+    try:
+        con = sqlite3.connect('example.db')
+    except:
+        print("Not possible to connect to database")
+        logging.error('[ERROR] - Not possible to connect to database\n')
     createTables(con)
-except:
-    print("Not possible to connect to database")
+else:
+    try:
+        con = sqlite3.connect('example.db')
+    except:
+        print("Not possible to connect to database")
+        logging.error('[ERROR] - Not possible to connect to database\n')
 
 # Calling main menu function
 logging.info('[INFO] - Starting script\n')
