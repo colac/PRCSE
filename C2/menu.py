@@ -136,6 +136,7 @@ def userMenu():
                 username = input('\nType the username to modify: ')
                 # Get current values from the role in the DB
                 result = find_user(con,(username,))
+                # If the find_user function returns nothing, then the user doesn't exist
                 if result is not None:
                     break
                 else:
@@ -267,7 +268,31 @@ def resourcesMenu():
             if error == "OK":
                 error = "Resource " + resource + " created successfully"
         elif choice == '2' :
-            print(f'\nChoice: {choice}')
+            while True:
+                # Modify resource, gets input from user
+                resource_name = input('\nName of the resource to modify: ')
+                # Get current values from the role in the DB
+                result = find_resource(con,(resource_name,))
+                resource_name_current = result[0]
+                if result is not None:
+                    break
+                else:
+                    print(f'\n[ERROR] - Resource "{resource_name}" not found!')
+                    continue
+            # Get new name for the role, or keep the same by hitting enter
+            # In case the user doesn't write anything, we save this variable to use later
+            resource_name = input(f'\nNew name of the resource (To keep the current name "{resource_name_current}", just hit "Enter" button): ')
+            if not resource_name.isspace() and not resource_name.strip():
+                #print("Nothing written for roleName")
+                resource_name = resource_name_current
+                #resource = (resource_name)
+            error = update_role(con,resource_name)
+            if error == "OK":
+                error = f'[INFO] - Resource "{resource_name}" updated successfully.'
+                logging.info(f'[INFO] - Resource "{resource_name_current}" updated successfully. {resource_name}\n')
+            else:
+                error = f'[ERROR] - Resource: "{resource_name}" couldnt be updated.'
+                logging.error(f'[ERROR] - Resource: {resource_name} couldnt be updated.\n')
         elif choice == '3' :
             # Delete a resource, gets input from user. Before deleting checks if it exists in DB
             resource = input("\nName of the resource to delete: ")
@@ -313,8 +338,7 @@ def resourcesMenu():
             exit()
         else:
             error=f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!'
-            #print(f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!')
-            logging.error(f'ERROR - Choice: {choice} is NOT valid!')
+            logging.error(f'[ERROR] - Choice: {choice} is NOT valid!')
 
 # Roles menu, perform operations related to roles
 def rolesMenu():
@@ -377,8 +401,11 @@ def rolesMenu():
             else:
                 error = f'Role permission "{role_permission}" is not valid!'
             if error == "OK":
-                error = f'Role "{role_name}" updated successfully.'
-                logging.info(f'[INFO]- Role: {role_name_current}, updated successfully. {role_name} {role_resource} {role_permission}\n')
+                error = f'[INFO] - Role "{role_name}" updated successfully.'
+                logging.info(f'[INFO] - Role: {role_name_current}, updated successfully. {role_name} {role_resource} {role_permission}\n')
+            else:
+                error = f'[ERROR] - Role: "{role_name}" couldnt be updated.'
+                logging.error(f'[ERROR] - Role: {role_name} couldnt be updated.\n')
         elif choice == '3' :
             # Delete a role, gets input from user. Before deleting checks if it exists in DB
             role = input("\nName of the role to delete: ")
@@ -402,7 +429,7 @@ def rolesMenu():
             print(f'\n### List of all roles ###')
             results = list_role(con,"ALL")
             for row in results:
-                print(row[0])
+                print(f'\nRole name: "{row[0]}"; Resource permission: "{row[1]}"; Permission: "{row[2]}";')
             input("\nPress <enter> to continue")
             rolesMenu()
         elif choice == '6' :
