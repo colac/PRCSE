@@ -67,7 +67,14 @@ def userMenu():
         choice = input("\nEnter your choice : ")
 
         if choice == '1':
-            username = input('\nType user account name: ')
+            while True:
+                username = input('\nType user account name: ')
+                if not re.search('^[a-z0-9]+[\._]?[ a-z0-9]+[@]\w+[. ]\w{2,}$', username):
+                    print(f'\n[ERROR] - Not a valid email!')
+                    continue
+                else:
+                    print(f'\nValidity ok.')
+                    break
             name = input('\nType user name: ')
             bank_account_number = input('\nType bank account number: ')
             while True:
@@ -122,7 +129,7 @@ def userMenu():
                     # If user delete went ok, return info to user
                     if delete_user_return == "OK":
                         error = f'\n[INFO] - User: "{username}" deleted.'
-                        logging.info(f'### INFO - role: "{username}"", deleted ###\n')
+                        logging.info(f'[INFO] INFO - role: "{username}"", deleted\n')
                     # If user creation didn't go ok, return error to user
                     else:
                         error = f'\n[ERROR] - Couldnt delete user: "{username}"\n"{insert_user_return}"'
@@ -196,7 +203,7 @@ def resourcesMenu():
                     # Delete operation requires a commit, so that when the connection is closed to the DB the resource is actually deleted
                     con.commit()
                     print(f'Resource: {resource}, deleted')
-                    logging.info(f'### INFO - Resource: {resource}, deleted ###\n')
+                    logging.info(f'[INFO] - Resource: {resource}, deleted.\n')
                 else:
                     print(f'{resource}, is not a resource!')
             else:
@@ -265,7 +272,7 @@ def rolesMenu():
                 error = f'Role permission "{role_permission}" is not valid!'
             if error == "OK":
                 error = f'Role "{role_name}" created successfully.'
-                logging.info(f'### INFO - Role: {role_name}, created successfully. ###\n')
+                logging.info(f'[INFO] - Role: {role_name}, created successfully.\n')
         elif choice == '2' :
             # Change role, gets input from user
             role_name_current = input('\nName of the role to modify: ')
@@ -295,7 +302,7 @@ def rolesMenu():
                 error = f'Role permission "{role_permission}" is not valid!'
             if error == "OK":
                 error = f'Role "{role_name}" updated successfully.'
-                logging.info(f'### INFO - Role: {role_name_current}, updated successfully. {role_name} {role_resource} {role_permission} ###\n')
+                logging.info(f'[INFO]- Role: {role_name_current}, updated successfully. {role_name} {role_resource} {role_permission}\n')
         elif choice == '3' :
             # Delete a role, gets input from user. Before deleting checks if it exists in DB
             role = input("\nName of the role to delete: ")
@@ -307,7 +314,7 @@ def rolesMenu():
                     # Delete operation requires a commit, so that when the connection is closed to the DB the role is actually deleted
                     con.commit()
                     error = f'Role: "{role}", deleted'
-                    logging.info(f'### INFO - role: {role}, deleted ###\n')
+                    logging.info(f'[INFO] - role: {role}, deleted.\n')
                 else:
                     print(f'{role}, is not a role!')
             else:
@@ -343,5 +350,5 @@ except:
     print("Not possible to connect to database")
 
 # Calling main menu function
-logging.info('### INFO - Starting script ###\n')
+logging.info('[INFO] - Starting script\n')
 mainMenu()
