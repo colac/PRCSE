@@ -22,7 +22,7 @@ def mainMenu():
         1 : User accounts actions (leads to another menu with create/delete/modify/list)
         2 : Company resources actions (leads to another menu with create/delete/modify/list)
         3 : Roles actions (leads to another menu with create/delete/modify/list)
-        4 : List all information
+        4 : Assign roles to user
         0 : Exit"""
               )
         choice = input("\nEnter your choice : ")
@@ -196,6 +196,7 @@ def userMenu():
             varQuestionDelete = input(f"\nAre you sure you want to delete role: {username}? (Y/N)")
             if varQuestionDelete in ('y', 'yes', 'Y', 'YES'):
                 varFind_username = find_user(con,(username,))
+                # If username exists, proceed to delete
                 if varFind_username[0] == username:
                     delete_user_return = delete_user(con,(username,))
                     # Delete operation requires a commit, so that when the connection is closed to the DB, the user is actually deleted
@@ -224,6 +225,7 @@ def userMenu():
             # Print all roles
             print(f'\n### List of all user accounts ###')
             results = list_user(con,"ALL")
+            # For each line in the returned results, show each value
             for row in results:
                 print(f'\nUsername: {row[0]}; Name: {row[1]}; Bank Account Number: {row[2]}; Password valid for: {row[3]} days; Password expiration date: {row[4]}')
             input("\nPress <enter> to continue")
@@ -236,7 +238,7 @@ def userMenu():
             exit()
         else:
             error=f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!'
-            logging.error(f'ERROR - Choice: {choice} is NOT valid!')
+            logging.error(f'[ERROR] - Choice: {choice} is NOT valid!')
 
 # Resources menu, perform operations related to resources
 def resourcesMenu():
@@ -433,4 +435,5 @@ else:
 
 # Calling main menu function
 logging.info('[INFO] - Starting script\n')
+
 mainMenu()

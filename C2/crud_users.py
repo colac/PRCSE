@@ -115,3 +115,15 @@ def delete_user(con,user):
             return("OK")
     except sqlite3.Error as e:
         return("An error occurred:", e.args[0])
+
+# List users with password expiration date within 7 days
+#
+# PARAMETERS:
+#   con     connection object
+#   user    Integer with Unix Epoch 
+#
+#  RETURN:
+#   List of tuples with username
+# ----------------------------------
+def list_users_password_to_be_expired(con,date_expire):
+    return con.execute('SELECT u_username FROM users WHERE u_password_expire_date < (?) ORDER BY u_username', (date_expire)).fetchall()
