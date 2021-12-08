@@ -57,7 +57,7 @@ def userMenu():
         print("\nChoose an option: ")
         print("""
         1 : Create user account                   (DONE)
-        2 : Update/Modify user account            (DONE) - falta validar nr conta bancaria
+        2 : Update/Modify user account            (DONE)
         3 : Delete user account                   (DONE)
         4 : List information of a user account    (DONE)
         5 : List information of all user accounts (DONE)
@@ -68,7 +68,7 @@ def userMenu():
 
         if choice == '1':
             while True:
-                username = input('\nType user account name: ')
+                username = input('\nType user account name (Email): ')
                 # Convert username to lowercase
                 username = username.lower()
                 # Check if the username entered is a valid email
@@ -84,7 +84,15 @@ def userMenu():
                     #print(f'\nValidity ok.')
                     break
             name = input('\nType user name: ')
-            bank_account_number = input('\nType bank account number: ')
+            while True:
+                bank_account_number = input('\nType bank account number: ')
+                # Bank account number must have 21 numbers
+                if not re.search('^[0-9]{21}$', bank_account_number):
+                    print(f'\n[ERROR] - Bank account number must have 21 numbers!')
+                    continue
+                else:
+                    #print(f'\nValidity ok.')
+                    break
             while True:
                 password_before_hash = input('\nType the password: ')
                 validate_password_return = validarPassword(password_before_hash)
@@ -143,9 +151,19 @@ def userMenu():
                 #print("Nothing written for userName")
                 name = name_current
             # Get bank account number, or keep the same by hitting enter
-            bank_account_number = input(f'\nNew bank account number (To keep the current value "{bank_account_number_current}", just hit "Enter" button): ')
-            if not bank_account_number.isspace() and not bank_account_number.strip():
-                bank_account_number = bank_account_number_current
+            while True:
+                bank_account_number = input(f'\nNew bank account number (To keep the current value "{bank_account_number_current}", just hit "Enter" button): ')
+                # Exit while cycle, keeping the bank account number already in the DB
+                if not bank_account_number.isspace() and not bank_account_number.strip():
+                    bank_account_number = bank_account_number_current
+                    break
+                # Bank account number must have 21 numbers
+                elif not re.search('^[0-9]{21}$', bank_account_number):
+                    print(f'\n[ERROR] - Bank account number must have 21 numbers!')
+                    continue
+                else:
+                    #print(f'\nValidity ok.')
+                    break
             while True:
                 # New password validity time, or keep the same by hitting enter
                 password_validity = input(f'\nNew password validity time (To keep the current value "{password_validity_current}", just hit "Enter" button): ')
