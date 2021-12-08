@@ -1,11 +1,35 @@
 #!/usr/bin/env python3
 import os, logging
 import app_logging
+from datetime import datetime, timezone, timedelta
 from crud_resources import *
 from createDB import *
 from crud_users import *
 from crud_roles import *
 from crud_user_roles import *
+
+# Create the timestamp in miliseconds, used for password expiration date
+def converto_to_ms(days_valid):
+    # Convert number of days, currently a string, to int
+    days_valid = int(days_valid)
+    # The method "strptime" creates a datetime object from the given string. This string is created using "strftime"
+    # Creating the current date string, like "2021-12-08"
+    current_date = datetime.strptime(datetime.now(timezone.utc).strftime("%Y%m%d"),'%Y%m%d')
+    # Creates the expiration date string. "timedelta" is a class that allows the input of a duration, expressing the difference between two dates, in our case the variable "days" 
+    expiration_date = current_date + timedelta(days=days_valid)
+    # Convert date to miliseconds
+    expiration_milisec_date = expiration_date.timestamp() * 1000
+    return expiration_milisec_date
+
+# Convert the timestamp in miliseconds to date, used for password expiration
+def converto_from_ms(date_to_convert):
+    # Convert value received, currently a string, to int
+    date_to_convert = int(date_to_convert)
+    # Convert from miliseconds to date Year-Month-Day HH:MM:SS
+    date_converted = datetime.fromtimestamp(date_to_convert/1000.0)
+    # Show only Year-Month-Day, removing HH:MM:SS
+    date_converted = date_converted.strftime('%Y-%m-%d')
+    return date_converted
 
 # Main menu, the 1st menu the operator sees
 def mainMenu():
@@ -56,8 +80,9 @@ def userMenu():
         1 : Create user account
         2 : Update/Modify user account
         3 : Delete user account
-        4 : List information for a user account
-        5 : Return to main menu
+        4 : List information of a user account
+        5 : List information of all user accounts
+        6 : Return to main menu
         0 : Exit"""
               )
         choice = input("\nEnter your choice : ")
@@ -69,9 +94,22 @@ def userMenu():
         elif choice == '3' :
             print(f'\nChoice: {choice}')
         elif choice == '4' :
-            print(f'\nChoice: {choice}')
+            user = input('\nType user account name: ')
+            # Get current values from the role in the DB
+            results = find_user(con,(user,))
+            print(f'\nUsername: {results[0]}; Name: {results[1]}; Bank Account Number: {results[2]}; Password valid for: {results[3]} days; Password expiration date: {results[4]}')
+            input("\nPress <enter> to continue")
+            userMenu()
         elif choice == '5' :
             print(f'\nChoice: {choice}')
+            # Print all roles
+            print(f'\n### List of all user accounts ###')
+            results = list_user(con,"ALL")
+            for row in results:
+                print(f'\nUsername: {row[0]}; Name: {row[1]}; Bank Account Number: {row[2]}; Password valid for: {row[3]} days; Password expiration date: {row[4]}')
+            input("\nPress <enter> to continue")
+            userMenu()
+        elif choice == '6' :
             mainMenu()
         elif choice == '0':
             print(f'\nChoice: {choice}')
@@ -79,7 +117,6 @@ def userMenu():
             exit()
         else:
             error=f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!'
-            #print(f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!')
             logging.error(f'ERROR - Choice: {choice} is NOT valid!')
 
 # Resources menu, perform operations related to resources
