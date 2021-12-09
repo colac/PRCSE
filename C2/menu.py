@@ -334,7 +334,7 @@ def resourcesMenu():
         print("\nChoose an option: ")
         print("""
         1 : Create company resource                             (DONE)
-        2 : Update/Modify company resource
+        2 : Update/Modify company resource                      (DONE)
         3 : Delete company resource                             (DONE)
         4 : List which users have access to a specific resource
         5 : List resources that contain "input" in the name     (DONE)
