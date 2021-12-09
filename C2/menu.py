@@ -23,6 +23,7 @@ def mainMenu():
         2 : Company resources actions (leads to another menu with create/delete/modify/list)
         3 : Roles actions (leads to another menu with create/delete/modify/list)
         4 : Assign roles to user
+        5 : List, and print to file, which users will have their password expire in the next 7 days
         0 : Exit"""
               )
         choice = input("\nEnter your choice : ")
@@ -79,6 +80,27 @@ def mainMenu():
                         continue
             else:
                 error=f'\n[ERROR] - Resource {resource} does not exists!'
+        elif choice == '5' :
+            # Get which users will have their password expire in 7 days
+            date_in_ms = convert_to_ms(7)
+            results = list_users_password_to_be_expired(con,(date_in_ms,))
+            # Open file where we write
+            current_date = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+            file_users_password_expiration = open(f'user_password_expire_7_days_{current_date}.txt',"w")
+            for row in results:
+                # Username gotten from query
+                username = row[0]
+                # Get date of password expiration in miliseconds
+                date_to_convert = row[1]
+                # Convert to Year-Month-Day
+                expiration_date_human = convert_from_ms(date_to_convert)
+                message = f'Username: "{username}"; Date of expiration: "{expiration_date_human}"\n'
+                #print(f'Username: "{username}"; Date of expiration: "{expiration_date_human}"')
+                print(message)
+                file_users_password_expiration.write(message)
+            file_users_password_expiration.close()
+            logging.error(f'[INFO] - Option 5 used - passwords expiring in 7 days.')
+            choice = input("\nPress [enter] to continue")
         elif choice == '0':
             print(f'\nChoice: {choice}')
             con.close()
@@ -87,7 +109,7 @@ def mainMenu():
             #os.system("clear")
             error=f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!' #VM
             #print(f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!')
-            logging.error(f'ERROR - Choice: {choice} is NOT valid!')
+            logging.error(f'[ERROR] - Choice: {choice} is NOT valid!')
 
 # User menu, perform operations related to user accounts
 def userMenu():
@@ -161,7 +183,7 @@ def userMenu():
                 else:
                     #print(f'\nValidity ok.')
                     break
-            password_expire_date = converto_to_ms(password_validity_days)
+            password_expire_date = convert_to_ms(password_validity_days)
             # Create user tuple to send to the DB
             user = (username,name,bank_account_number,password_hash,password_validity_days,password_expire_date)
             # Creating user in DB
@@ -258,7 +280,7 @@ def userMenu():
                     password_before_hash = password_before_hash.encode('UTF-8')
                     break
             password_hash = hashlib.sha256(password_before_hash).hexdigest()
-            password_expire_date = converto_to_ms(password_validity_days)
+            password_expire_date = convert_to_ms(password_validity_days)
             print(password_hash)
             print(password_expire_date)
             print(username)
@@ -531,7 +553,7 @@ def rolesMenu():
         else:
             error=f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!'
             #print(f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!')
-            logging.error(f'ERROR - Choice: {choice} is NOT valid!')
+            logging.error(f'[ERROR] - Choice: {choice} is NOT valid!')
 
 ### Script execution ###
 
@@ -540,7 +562,7 @@ if not os.path.isfile("example.db"):
     try:
         con = sqlite3.connect('example.db')
     except:
-        print("Not possible to connect to database")
+        print("[ERROR] - Not possible to connect to database")
         logging.error('[ERROR] - Not possible to connect to database\n')
     # Function that creates the DB if it doesn't exist
     createTables(con)
@@ -548,7 +570,7 @@ else:
     try:
         con = sqlite3.connect('example.db')
     except:
-        print("Not possible to connect to database")
+        print("[ERROR] - Not possible to connect to database")
         logging.error('[ERROR] - Not possible to connect to database\n')
 
 # Calling main menu function
