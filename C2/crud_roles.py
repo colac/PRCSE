@@ -33,7 +33,7 @@ def insert_role(con,role):
             con.execute("insert into roles values (?,?,?)", (role))
             return("OK")
     except sqlite3.IntegrityError:
-        return("Role already exists")
+        return("role already exists")
     except sqlite3.Error as e:
         return("An error occurred:", e.args[0])
 
@@ -56,6 +56,18 @@ def list_role(con,role):
         return con.execute('SELECT * FROM roles ORDER BY r_name').fetchall()
     else:
         return con.execute('SELECT * FROM roles WHERE r_name like (?) ORDER BY r_name', (role)).fetchall()
+
+# List roles for a specific resource Function
+#
+# PARAMETERS:
+#   con        connection object
+#   resrouce   tuple with values to list
+#
+#  RETURN:
+#   List of tuples with all table columns
+# ----------------------------------
+def list_role_for_resource(con,resource):
+    return con.execute('SELECT * FROM roles WHERE r_resource like (?) ORDER BY r_name', (resource)).fetchall()
 
 # Find roles Function
 #

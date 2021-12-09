@@ -193,7 +193,46 @@ def userMenu():
                 error = f'[ERROR] - User: "{username}" couldnt be updated.'
                 logging.error(f'[ERROR] - User: {username} couldnt be updated.\n')
         elif choice == '3' :
-            print("Change user pw")
+            while True:
+                # Modify user, gets input from user
+                username = input('\nType the username to change the password (Email): ')
+                # Get current values from the role in the DB
+                result = find_user(con,(username,))
+                # If the find_user function returns nothing, then the user doesn't exist
+                if result is not None:
+                    break
+                else:
+                    print(f'\n[ERROR] - User "{username}" not found!')
+                    continue
+            # Get password validity days, from the function "find_user" to calculate the new expiration date
+            password_validity_days = result[3]
+            while True:
+                password_before_hash = input(f'\nType the new password, for user "{username}": ')
+                validate_password_return = validarPassword(password_before_hash)
+                if not validate_password_return == "OK":
+                    print(f'\n{validate_password_return}')
+                    continue
+                else:
+                    #print(f'\nValidity ok.')
+                    password_before_hash = password_before_hash.encode('UTF-8')
+                    break
+            password_hash = hashlib.sha256(password_before_hash).hexdigest()
+            password_expire_date = converto_to_ms(password_validity_days)
+            print(password_hash)
+            print(password_expire_date)
+            print(username)
+            input("press enter to continue")
+            user_password_updates = (password_hash,password_expire_date,username)
+            update_password_return = update_user_password(con,user_password_updates)
+            # If user delete went ok, return info to user
+            if update_password_return == "OK":
+                error = f'\n[INFO] - Password for user: "{username}" updated succesfully.'
+                logging.info(f'[INFO] - Password for user: "{username}" updated succesfully.\n')
+            # If user creation didn't go ok, return error to user
+            else:
+                # {update_password_return} returns the output of the function "update_user_password", in this case returns the error
+                error = f'\n[ERROR] - Couldnt update user "{username}" password. {update_password_return}'
+                logging.info(f'\n[ERROR] - Couldnt update user "{username}" password.\n {update_password_return}')
         elif choice == '4' :
             # Delete a role, gets input from user. Before deleting checks if it exists in DB
             username = input("\nUsername to delete: ")
