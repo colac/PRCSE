@@ -97,7 +97,9 @@ def mainMenu():
                 message = f'Username: "{username}"; Date of expiration: "{expiration_date_human}"\n'
                 #print(f'Username: "{username}"; Date of expiration: "{expiration_date_human}"')
                 print(message)
+                # Write each entry received from the query to the file
                 file_users_password_expiration.write(message)
+            # Close file, since the cycle "for" is done, there's no data left to write
             file_users_password_expiration.close()
             logging.error(f'[INFO] - Option 5 used - passwords expiring in 7 days.')
             choice = input("\nPress [enter] to continue")
