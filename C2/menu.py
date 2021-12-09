@@ -58,10 +58,11 @@ def userMenu():
         print("""
         1 : Create user account                   (DONE)
         2 : Update/Modify user account            (DONE)
-        3 : Delete user account                   (DONE)
-        4 : List information of a user account    (DONE)
-        5 : List information of all user accounts (DONE)
-        6 : Return to main menu
+        3 : Change user password                  
+        4 : Delete user account                   (DONE)
+        5 : List information of a user account    (DONE)
+        6 : List information of all user accounts (DONE)
+        7 : Return to main menu
         0 : Exit"""
               )
         choice = input("\nEnter your choice : ")
@@ -192,6 +193,8 @@ def userMenu():
                 error = f'[ERROR] - User: "{username}" couldnt be updated.'
                 logging.error(f'[ERROR] - User: {username} couldnt be updated.\n')
         elif choice == '3' :
+            print("Change user pw")
+        elif choice == '4' :
             # Delete a role, gets input from user. Before deleting checks if it exists in DB
             username = input("\nUsername to delete: ")
             varQuestionDelete = input(f"\nAre you sure you want to delete role: {username}? (Y/N)")
@@ -205,7 +208,7 @@ def userMenu():
                     # If user delete went ok, return info to user
                     if delete_user_return == "OK":
                         error = f'\n[INFO] - User: "{username}" deleted.'
-                        logging.info(f'[INFO] INFO - role: "{username}"", deleted\n')
+                        logging.info(f'[INFO] - role: "{username}"", deleted\n')
                     # If user creation didn't go ok, return error to user
                     else:
                         error = f'\n[ERROR] - Couldnt delete user: "{username}"\n"{insert_user_return}"'
@@ -214,14 +217,14 @@ def userMenu():
                     print(f'{username}, is not a role!')
             else:
                 print(f'Role: {username}, not deleted')
-        elif choice == '4' :
+        elif choice == '5' :
             username = input('\nType user account name: ')
             # Get current values from the role in the DB
             results = find_user(con,(username,))
             print(f'\n[Username]: {results[0]}; [Name]: {results[1]}; [Bank Account Number]: {results[2]}; [Password valid for]: {results[3]} days; [Password expiration date]: {results[4]}')
             input("\nPress <enter> to continue")
             userMenu()
-        elif choice == '5' :
+        elif choice == '6' :
             print(f'\nChoice: {choice}')
             # Print all roles
             print(f'\n### List of all user accounts ###')
@@ -231,7 +234,7 @@ def userMenu():
                 print(f'\nUsername: {row[0]}; Name: {row[1]}; Bank Account Number: {row[2]}; Password valid for: {row[3]} days; Password expiration date: {row[4]}')
             input("\nPress <enter> to continue")
             userMenu()
-        elif choice == '6' :
+        elif choice == '7' :
             mainMenu()
         elif choice == '0':
             print(f'\nChoice: {choice}')
@@ -303,12 +306,14 @@ def resourcesMenu():
                     delete_resource(con,(resource,))
                     # Delete operation requires a commit, so that when the connection is closed to the DB the resource is actually deleted
                     con.commit()
-                    print(f'Resource: {resource}, deleted')
+                    error = f'[INFO] - Resource: {resource}, deleted.'
                     logging.info(f'[INFO] - Resource: {resource}, deleted.\n')
                 else:
                     print(f'{resource}, is not a resource!')
+                    error = f'[ERROR] - {resource}, is not a resource!'
             else:
-                print(f'Resource: {resource}, not deleted')
+                print(f'Resource: {resource}, not deleted.')
+                error = f'[ERROR] - {resource}, not deleted.'
         elif choice == '4' :
             print(f'\nChoice: {choice}')
         elif choice == '5' :
@@ -337,7 +342,7 @@ def resourcesMenu():
             con.close()
             exit()
         else:
-            error=f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!'
+            error = f'\n[ERROR] - Please insert a valid option. Choice: {choice} is NOT valid!'
             logging.error(f'[ERROR] - Choice: {choice} is NOT valid!')
 
 # Roles menu, perform operations related to roles
@@ -349,11 +354,11 @@ def rolesMenu():
         print(f"{error}")
         print("\nChoose an option: ")
         print("""
-        1 : Create a role                           (DONE)
-        2 : Update/Modify a role                    (DONE)
-        3 : Delete role                             (DONE)
-        4 : List which users have a specific role
-        5 : List all roles                          (DONE)
+        1 : Create a role                               (DONE)
+        2 : Update/Modify a role                        (DONE)
+        3 : Delete role                                 (DONE)
+        4 : List which users have a specific resource   (DONE)
+        5 : List all roles                              (DONE)
         6 : Return to main menu
         0 : Exit"""
               )
@@ -423,7 +428,12 @@ def rolesMenu():
             else:
                 print(f'Role: {role}, not deleted')
         elif choice == '4' :
-            print(f'\nChoice: {choice}')
+            resource = input("\nType resource name: ")
+            results = list_resources_accessed_by_user(con,(resource,))
+            # Get users that have access to specific resource
+            for row in results:
+                print(f'\nUsername: "{row[0]}"; Name: "{row[1]}"; Role: "{row[2]}"; Resource: "{row[3]}; Permission: "{row[4]}";')
+            input("\nPress <enter> to continue")
         elif choice == '5' :
             # Print all roles
             print(f'\n### List of all roles ###')
@@ -452,6 +462,7 @@ if not os.path.isfile("example.db"):
     except:
         print("Not possible to connect to database")
         logging.error('[ERROR] - Not possible to connect to database\n')
+    # Function that creates the DB if it doesn't exist
     createTables(con)
 else:
     try:
@@ -462,5 +473,5 @@ else:
 
 # Calling main menu function
 logging.info('[INFO] - Starting script\n')
-
+# Executing program
 mainMenu()
